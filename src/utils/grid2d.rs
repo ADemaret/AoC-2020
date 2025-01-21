@@ -191,6 +191,28 @@ impl Grid2D {
     }
 
     ///
+    /// Renvoie les caractères d'une ligne
+    /// 
+    pub fn get_line(&self,line : usize) -> Vec<char> {
+        let mut vec = Vec::new();
+        for c in 0..self.max_c {
+            vec.push(self.grid[line][c]);
+        }
+        vec
+    }
+
+    ///
+    /// Renvoie les caractères d'une colonne
+    /// 
+    pub fn get_column(&self,col : usize) -> Vec<char> {
+        let mut vec = Vec::new();
+        for l in 0..self.max_l {
+            vec.push(self.grid[l][col]);
+        }
+        vec
+    }
+
+    ///
     /// Modifie le caractère à un point donné
     /// 
     pub fn set_at(&mut self,pt:(usize,usize),value:char) {
