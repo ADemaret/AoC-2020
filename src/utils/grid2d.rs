@@ -100,7 +100,7 @@ impl Grid2D {
         println!("─┘");
     }
 
-        ///
+    ///
     /// Affiche une partie de la grille avec numéros de lignes et de colonnes
     /// 
     pub fn print_sub(&self,l_min:usize,l_max:usize,c_min:usize,c_max:usize){
@@ -213,10 +213,36 @@ impl Grid2D {
     }
 
     ///
+    /// Renvoie une sous-grille (tile)
+    /// 
+    pub fn get_tile(&self,l0:usize,c0:usize,dl:usize,dc:usize) -> Grid2D {
+        let mut tile = Grid2D::new_empty(dl, dc, ' ');
+        for l in 0..dl {
+            for c in 0..dc {
+                tile.set_at((l,c),self.grid[l0+l][c0+c]);
+            }
+        }
+        tile
+    }
+
+
+    ///
     /// Modifie le caractère à un point donné
     /// 
     pub fn set_at(&mut self,pt:(usize,usize),value:char) {
         self.grid[pt.0][pt.1] = value;
+    }
+   
+
+    ///
+    /// Copie une région ("tile") dans une partie de la grille
+    /// 
+    pub fn insert_tile(&mut self,sub_grid:&Grid2D,l0:usize,c0:usize) {
+        for l in l0..l0+sub_grid.max_l {
+            for c in c0..c0+sub_grid.max_c {
+                self.set_at((l,c), sub_grid.get_at((l-l0,c-c0)));
+            }
+        }
     }
 
     ///
@@ -337,6 +363,38 @@ impl Grid2D {
     }
 
     ///
+    /// flip the grid horizontaly
+    /// 
+    #[allow(clippy::needless_range_loop)]
+    pub fn flip_horizontal(self) -> Grid2D {
+        let mut new_grid = Vec::new();
+        for l in 0..self.max_l {
+            let mut line = Vec::new();
+            for c in 0..self.max_c {                
+                line.push( self.grid[l][self.max_c-c-1]);
+            }
+            new_grid.push(line);
+        }
+        Grid2D {max_l:self.max_c, max_c:self.max_l, grid:new_grid}
+    }
+
+    ///
+    /// flip the grid vertically
+    /// 
+    #[allow(clippy::needless_range_loop)]
+    pub fn flip_vertical(self) -> Grid2D {
+        let mut new_grid = Vec::new();
+        for l in (0..self.max_l).rev() {
+            let mut line = Vec::new();
+            for c in 0..self.max_c {                
+                line.push( self.grid[l][c]);
+            }
+            new_grid.push(line);
+        }
+        Grid2D {max_l:self.max_c, max_c:self.max_l, grid:new_grid}
+    }
+
+    ///
     /// rotate the grid 90° counter-clockwise
     /// 
     #[allow(clippy::needless_range_loop)]
@@ -348,5 +406,18 @@ impl Grid2D {
             }
         }
         Grid2D {max_l:self.max_c, max_c:self.max_l, grid:new_grid}
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_grid() {
+        let grid = Grid2D::new("#.\n..");        
+        assert_eq!(grid.flip_horizontal().grid,vec![['.','#'],['.','.']]);
+        let grid = Grid2D::new("#.\n..");        
+        assert_eq!(grid.flip_vertical().grid,vec![['.','.'],['#','.']]);
     }
 }
